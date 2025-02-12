@@ -13,16 +13,72 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    pages: Page;
+    products: Product;
+    materials: Material;
+    ProductionPlans: ProductionPlan;
+    orders: Order;
+    categories: Category;
+    posts: Post;
+    test1: Test1;
+    tasks: Task;
+    Products_Inventory: Products_Inventory;
+    Materials_Inventory: Materials_Inventory;
+    Suppliers: Supplier;
+    department: Department;
+    WorkTime: WorkTime;
+    'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
+  };
+  collectionsJoins: {
+    users: {
+      WorkTime_User: 'WorkTime';
+    };
+    products: {
+      quantity: 'Products_Inventory';
+    };
+    materials: {
+      tonkho: 'Materials_Inventory';
+      supplier: 'Suppliers';
+    };
+    categories: {
+      post: 'posts';
+    };
+  };
+  collectionsSelect: {
+    users: UsersSelect<false> | UsersSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    materials: MaterialsSelect<false> | MaterialsSelect<true>;
+    ProductionPlans: ProductionPlansSelect<false> | ProductionPlansSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    test1: Test1Select<false> | Test1Select<true>;
+    tasks: TasksSelect<false> | TasksSelect<true>;
+    Products_Inventory: Products_InventorySelect<false> | Products_InventorySelect<true>;
+    Materials_Inventory: Materials_InventorySelect<false> | Materials_InventorySelect<true>;
+    Suppliers: SuppliersSelect<false> | SuppliersSelect<true>;
+    department: DepartmentSelect<false> | DepartmentSelect<true>;
+    WorkTime: WorkTimeSelect<false> | WorkTimeSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: string;
   };
   globals: {};
+  globalsSelect: {};
   locale: null;
   user: User & {
     collection: 'users';
+  };
+  jobs: {
+    tasks: unknown;
+    workflows: unknown;
   };
 }
 export interface UserAuthOperations {
@@ -49,6 +105,54 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  title?: string | null;
+  userID?: string | null;
+  fullName: string;
+  sex: 'Nam' | 'Nữ';
+  ID: string;
+  Date_of_birth?: string | null;
+  address?: string | null;
+  phone?: string | null;
+  'Học Vấn': {
+    degree: string;
+    university: string;
+    specialization: string;
+    Certificate?:
+      | {
+          nameCertificate?: string | null;
+          img?: (string | null) | Media;
+          Note?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  Skill?: {
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  employee?: {
+    position?: ('manager' | 'deputyManager' | 'employees') | null;
+    department?: (string | null) | Department;
+    salary?: number | null;
+    assignedTasks?: (string | null) | Task;
+  };
+  WorkTime_User?: {
+    docs?: (string | WorkTime)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -78,6 +182,330 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "department".
+ */
+export interface Department {
+  id: string;
+  nameDepartment?: string | null;
+  idDepartment?: string | null;
+  Note?: string | null;
+  title?: string | null;
+  Os_Field?: {
+    manager?: (string | null) | User;
+    deputyManager?: (string | null) | User;
+    employees?: (string | User)[] | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks".
+ */
+export interface Task {
+  id: string;
+  taskId?: string | null;
+  taskName?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WorkTime".
+ */
+export interface WorkTime {
+  id: string;
+  info_worktime?: (string | null) | User;
+  time_worktime?: string | null;
+  shift: 'morning' | 'afternoon' | 'night';
+  note?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: string;
+  name: string;
+  slug: number;
+  layout?:
+    | (
+        | {
+            heading?: string | null;
+            text?: string | null;
+            backgroundImage?: (string | null) | Media;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            heading?: string | null;
+            text?: string | null;
+            backgroundImage?: (string | null) | Media;
+            direction?: ('default' | 'reverse') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'towcolumn';
+          }
+      )[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: string;
+  productID?: string | null;
+  nameProduct?: string | null;
+  category?: string | null;
+  size?: string | null;
+  material?: (string | Material)[] | null;
+  quantity?: {
+    docs?: (string | Products_Inventory)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  Price?: number | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "materials".
+ */
+export interface Material {
+  id: string;
+  materialsID?: string | null;
+  materialsName?: string | null;
+  tonkho?: {
+    docs?: (string | Materials_Inventory)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  supplier?: {
+    docs?: (string | Supplier)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  cost?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Materials_Inventory".
+ */
+export interface Materials_Inventory {
+  id: string;
+  inventoryId?: string | null;
+  materialsID?: (string | null) | Material;
+  amount?: number | null;
+  unit?: ('Tấn' | 'Tạ' | 'Yến' | 'Kg') | null;
+  location?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Suppliers".
+ */
+export interface Supplier {
+  id: string;
+  name?: string | null;
+  ad?: string | null;
+  address?: string | null;
+  sdt?: string | null;
+  fax?: number | null;
+  email: string;
+  webside?: string | null;
+  'Imported materials'?: (string | Material)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Products_Inventory".
+ */
+export interface Products_Inventory {
+  id: string;
+  inventoryId?: string | null;
+  productId?: (string | null) | Product;
+  amount?: number | null;
+  unit?: ('Cái' | 'Đôi' | 'Yến') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductionPlans".
+ */
+export interface ProductionPlan {
+  id: string;
+  planID?: string | null;
+  productID?: string | null;
+  quantity?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  status?: ('đang chờ' | 'đang sản xuất' | 'hoàn thành') | null;
+  assignedTo?: string | null;
+  materialId?: string | null;
+  materialQuantity?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  orderId?: string | null;
+  customerName?: string | null;
+  customerEmail?: string | null;
+  productId?: string | null;
+  quantity?: number | null;
+  totalAmount?: number | null;
+  status?: ('đang xử lý' | 'đã giao' | 'đã hủy') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  post?: {
+    docs?: (string | Post)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: string;
+  title: string;
+  category: string | Category;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "test1".
+ */
+export interface Test1 {
+  id: string;
+  test: string;
+  email: string;
+  name?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents".
+ */
+export interface PayloadLockedDocument {
+  id: string;
+  document?:
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: string | Page;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: string | Product;
+      } | null)
+    | ({
+        relationTo: 'materials';
+        value: string | Material;
+      } | null)
+    | ({
+        relationTo: 'ProductionPlans';
+        value: string | ProductionPlan;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: string | Post;
+      } | null)
+    | ({
+        relationTo: 'test1';
+        value: string | Test1;
+      } | null)
+    | ({
+        relationTo: 'tasks';
+        value: string | Task;
+      } | null)
+    | ({
+        relationTo: 'Products_Inventory';
+        value: string | Products_Inventory;
+      } | null)
+    | ({
+        relationTo: 'Materials_Inventory';
+        value: string | Materials_Inventory;
+      } | null)
+    | ({
+        relationTo: 'Suppliers';
+        value: string | Supplier;
+      } | null)
+    | ({
+        relationTo: 'department';
+        value: string | Department;
+      } | null)
+    | ({
+        relationTo: 'WorkTime';
+        value: string | WorkTime;
+      } | null);
+  globalSlug?: string | null;
+  user: {
+    relationTo: 'users';
+    value: string | User;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -112,6 +540,317 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  title?: T;
+  userID?: T;
+  fullName?: T;
+  sex?: T;
+  ID?: T;
+  Date_of_birth?: T;
+  address?: T;
+  phone?: T;
+  'Học Vấn'?:
+    | T
+    | {
+        degree?: T;
+        university?: T;
+        specialization?: T;
+        Certificate?:
+          | T
+          | {
+              nameCertificate?: T;
+              img?: T;
+              Note?: T;
+              id?: T;
+            };
+      };
+  Skill?:
+    | T
+    | {
+        richText?: T;
+      };
+  employee?:
+    | T
+    | {
+        position?: T;
+        department?: T;
+        salary?: T;
+        assignedTasks?: T;
+      };
+  WorkTime_User?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  layout?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              heading?: T;
+              text?: T;
+              backgroundImage?: T;
+              id?: T;
+              blockName?: T;
+            };
+        towcolumn?:
+          | T
+          | {
+              heading?: T;
+              text?: T;
+              backgroundImage?: T;
+              direction?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  productID?: T;
+  nameProduct?: T;
+  category?: T;
+  size?: T;
+  material?: T;
+  quantity?: T;
+  Price?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "materials_select".
+ */
+export interface MaterialsSelect<T extends boolean = true> {
+  materialsID?: T;
+  materialsName?: T;
+  tonkho?: T;
+  supplier?: T;
+  cost?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductionPlans_select".
+ */
+export interface ProductionPlansSelect<T extends boolean = true> {
+  planID?: T;
+  productID?: T;
+  quantity?: T;
+  startDate?: T;
+  endDate?: T;
+  status?: T;
+  assignedTo?: T;
+  materialId?: T;
+  materialQuantity?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderId?: T;
+  customerName?: T;
+  customerEmail?: T;
+  productId?: T;
+  quantity?: T;
+  totalAmount?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  post?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  category?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "test1_select".
+ */
+export interface Test1Select<T extends boolean = true> {
+  test?: T;
+  email?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks_select".
+ */
+export interface TasksSelect<T extends boolean = true> {
+  taskId?: T;
+  taskName?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Products_Inventory_select".
+ */
+export interface Products_InventorySelect<T extends boolean = true> {
+  inventoryId?: T;
+  productId?: T;
+  amount?: T;
+  unit?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Materials_Inventory_select".
+ */
+export interface Materials_InventorySelect<T extends boolean = true> {
+  inventoryId?: T;
+  materialsID?: T;
+  amount?: T;
+  unit?: T;
+  location?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "Suppliers_select".
+ */
+export interface SuppliersSelect<T extends boolean = true> {
+  name?: T;
+  ad?: T;
+  address?: T;
+  sdt?: T;
+  fax?: T;
+  email?: T;
+  webside?: T;
+  'Imported materials'?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "department_select".
+ */
+export interface DepartmentSelect<T extends boolean = true> {
+  nameDepartment?: T;
+  idDepartment?: T;
+  Note?: T;
+  title?: T;
+  Os_Field?:
+    | T
+    | {
+        manager?: T;
+        deputyManager?: T;
+        employees?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "WorkTime_select".
+ */
+export interface WorkTimeSelect<T extends boolean = true> {
+  info_worktime?: T;
+  time_worktime?: T;
+  shift?: T;
+  note?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-locked-documents_select".
+ */
+export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
+  document?: T;
+  globalSlug?: T;
+  user?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-preferences_select".
+ */
+export interface PayloadPreferencesSelect<T extends boolean = true> {
+  user?: T;
+  key?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-migrations_select".
+ */
+export interface PayloadMigrationsSelect<T extends boolean = true> {
+  name?: T;
+  batch?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
