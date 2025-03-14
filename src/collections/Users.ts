@@ -7,8 +7,14 @@ export const Users: CollectionConfig = {
   auth: true,
   admin: {
     useAsTitle: 'title',
+    group: 'nhan su',
   },
   fields: [
+    {
+      name: 'email',
+      label: 'Email',
+      type: 'email',
+    },
     // Email added by default
     // Add more fields as needed
     {
@@ -35,13 +41,20 @@ export const Users: CollectionConfig = {
               name: 'fullName',
               label: 'Họ và Tên',
               type: 'text',
-              required: true,
+              validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
+                if (typeof value !== 'string') {
+                  return 'Giá trị phải là chuỗi số'
+                }
+                return true
+              },
             },
             {
               name: 'sex',
               label: 'Giới Tính',
               type: 'select',
-              required: true,
               options: [
                 {
                   label: 'Nam',
@@ -52,18 +65,32 @@ export const Users: CollectionConfig = {
                   value: 'Nữ',
                 },
               ],
+              validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
+                if (typeof value !== 'string') {
+                  return 'Giá trị phải là chuỗi số'
+                }
+                return true
+              },
             },
             {
               name: 'ID',
               label: 'Căn cước công dân',
               type: 'text',
-              required: true,
               validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
                 if (typeof value !== 'string') {
                   return 'Giá trị phải là chuỗi số'
                 }
                 const regex = /^(\d{9}|\d{12})$/
-                return regex.test(value) ? true : 'Căn Cước gồm 9 hoặc 12 số'
+                if (!regex.test(value)) {
+                  return 'Căn Cước phải gồm 9 hoặc 12 số'
+                }
+                return true // Trả về true nếu hợp lệ
               },
             },
             {
@@ -76,17 +103,51 @@ export const Users: CollectionConfig = {
                   displayFormat: 'd MMM yyy',
                 },
               },
+              validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
+
+                if (typeof value !== 'string') {
+                  return 'Giá trị phải là chuỗi ngày tháng'
+                }
+                const birthDate = new Date(value)
+                const today = new Date()
+                const age = today.getFullYear() - birthDate.getFullYear()
+                const monthDiff = today.getMonth() - birthDate.getMonth()
+                const dayDiff = today.getDate() - birthDate.getDate()
+                if (
+                  age < 18 ||
+                  (age === 18 && monthDiff < 0) ||
+                  (age === 18 && monthDiff === 0 && dayDiff < 0)
+                ) {
+                  return 'Bạn phải đủ 18 tuổi'
+                }
+                return true
+              },
             },
             {
               name: 'address',
               label: 'Địa Chỉ',
               type: 'text',
+              validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
+                if (typeof value !== 'string') {
+                  return 'Giá trị phải là chuỗi số'
+                }
+                return true
+              },
             },
             {
               name: 'phone',
               label: 'Số Điện Thoại',
               type: 'text',
               validate: (value: unknown) => {
+                if (!value) {
+                  return 'Không được để trống'
+                }
                 if (typeof value !== 'string') {
                   return 'Giá trị phải là chuỗi số'
                 }

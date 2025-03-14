@@ -6,6 +6,60 @@
  * and re-run `payload generate:types` to regenerate this file.
  */
 
+/**
+ * Supported timezones in IANA format.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "supportedTimezones".
+ */
+export type SupportedTimezones =
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
+
 export interface Config {
   auth: {
     users: UserAuthOperations;
@@ -23,10 +77,15 @@ export interface Config {
     test1: Test1;
     tasks: Task;
     Products_Inventory: Products_Inventory;
-    Materials_Inventory: Materials_Inventory;
+    MaterialsAndMachine_Inventory: MaterialsAndMachine_Inventory;
     Suppliers: Supplier;
     department: Department;
     WorkTime: WorkTime;
+    colors: Color;
+    subCategories: SubCategory;
+    machine: Machine;
+    goodsDeliveryNote: GoodsDeliveryNote;
+    goodsReceiveNote: GoodsReceiveNote;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -39,11 +98,15 @@ export interface Config {
       quantity: 'Products_Inventory';
     };
     materials: {
-      tonkho: 'Materials_Inventory';
       supplier: 'Suppliers';
+      products: 'products';
     };
     categories: {
-      post: 'posts';
+      subCategories: 'subCategories';
+      products: 'products';
+    };
+    machine: {
+      suppliers: 'Suppliers';
     };
   };
   collectionsSelect: {
@@ -59,10 +122,15 @@ export interface Config {
     test1: Test1Select<false> | Test1Select<true>;
     tasks: TasksSelect<false> | TasksSelect<true>;
     Products_Inventory: Products_InventorySelect<false> | Products_InventorySelect<true>;
-    Materials_Inventory: Materials_InventorySelect<false> | Materials_InventorySelect<true>;
+    MaterialsAndMachine_Inventory: MaterialsAndMachine_InventorySelect<false> | MaterialsAndMachine_InventorySelect<true>;
     Suppliers: SuppliersSelect<false> | SuppliersSelect<true>;
     department: DepartmentSelect<false> | DepartmentSelect<true>;
     WorkTime: WorkTimeSelect<false> | WorkTimeSelect<true>;
+    colors: ColorsSelect<false> | ColorsSelect<true>;
+    subCategories: SubCategoriesSelect<false> | SubCategoriesSelect<true>;
+    machine: MachineSelect<false> | MachineSelect<true>;
+    goodsDeliveryNote: GoodsDeliveryNoteSelect<false> | GoodsDeliveryNoteSelect<true>;
+    goodsReceiveNote: GoodsReceiveNoteSelect<false> | GoodsReceiveNoteSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -107,16 +175,16 @@ export interface User {
   id: string;
   title?: string | null;
   userID?: string | null;
-  fullName: string;
-  sex: 'Nam' | 'Nữ';
-  ID: string;
+  fullName?: string | null;
+  sex?: ('Nam' | 'Nữ') | null;
+  ID?: string | null;
   Date_of_birth?: string | null;
   address?: string | null;
   phone?: string | null;
-  'Học Vấn': {
-    degree: string;
-    university: string;
-    specialization: string;
+  hocvan?: {
+    degree?: string | null;
+    university?: string | null;
+    specialization?: string | null;
     Certificate?:
       | {
           nameCertificate?: string | null;
@@ -267,14 +335,41 @@ export interface Product {
   id: string;
   productID?: string | null;
   nameProduct?: string | null;
-  category?: string | null;
-  size?: string | null;
+  category?: (string | null) | Category;
+  subcategory?: (string | null) | SubCategory;
+  origin?: string | null;
+  price: number;
+  currency?: ('USD' | 'VND') | null;
+  previousCurrency?: string | null;
   material?: (string | Material)[] | null;
+  sizes?:
+    | {
+        size?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  color?: (string | Color)[] | null;
+  specialfeatures?: string | null;
+  QualityStandards?:
+    | {
+        nameCertificate?: string | null;
+        img?: (string | null) | Media;
+        Note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  SafetyCertification?:
+    | {
+        nameCertificate?: string | null;
+        img?: (string | null) | Media;
+        Note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   quantity?: {
     docs?: (string | Products_Inventory)[] | null;
     hasNextPage?: boolean | null;
   } | null;
-  Price?: number | null;
   description?: {
     root: {
       type: string;
@@ -295,35 +390,131 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  title?: string | null;
+  slug?: string | null;
+  image?: (string | null) | Media;
+  description?: string | null;
+  subCategories?: {
+    docs?: (string | SubCategory)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  products?: {
+    docs?: (string | Product)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  status?: ('active' | 'inactive') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subCategories".
+ */
+export interface SubCategory {
+  id: string;
+  title?: string | null;
+  slug?: string | null;
+  image?: (string | null) | Media;
+  description?: string | null;
+  parentCategory?: (string | null) | Category;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "materials".
  */
 export interface Material {
   id: string;
   materialsID?: string | null;
   materialsName?: string | null;
-  tonkho?: {
-    docs?: (string | Materials_Inventory)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
+  materialstype?: ('kimloai' | 'nhua' | 'go' | 'vai') | null;
   supplier?: {
     docs?: (string | Supplier)[] | null;
     hasNextPage?: boolean | null;
   } | null;
+  Origin?: string | null;
   cost?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Materials_Inventory".
- */
-export interface Materials_Inventory {
-  id: string;
-  inventoryId?: string | null;
-  materialsID?: (string | null) | Material;
-  amount?: number | null;
-  unit?: ('Tấn' | 'Tạ' | 'Yến' | 'Kg') | null;
-  location?: string | null;
+  currency?: ('VND' | 'USD') | null;
+  previousCurrency?: string | null;
+  Dimension?:
+    | {
+        Length?: string | null;
+        Width?: string | null;
+        Thickness?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  specificvolume?:
+    | {
+        Massspecific?: number | null;
+        Unitspecific?: ('g/cm³' | 'kg/m³') | null;
+        previousspecific?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  tensilestrength?:
+    | {
+        Masstensile?: number | null;
+        Unittensile?: ('MPa' | 'N/mm²') | null;
+        id?: string | null;
+      }[]
+    | null;
+  compressivestrength?:
+    | {
+        Masscompressive?: number | null;
+        Unitcompressive?: ('MPa' | 'N/mm²') | null;
+        id?: string | null;
+      }[]
+    | null;
+  temperaturetolerance?:
+    | {
+        Masstemperaturetolerance?: number | null;
+        Unittemperaturetolerance?: ('°C' | 'K') | null;
+        previoustemperaturetolerance?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  color?: (string | Color)[] | null;
+  qualitystandards?:
+    | {
+        nameCertificate?: string | null;
+        img?: (string | null) | Media;
+        Note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  safetycertification?:
+    | {
+        nameCertificate?: string | null;
+        img?: (string | null) | Media;
+        Note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  products?: {
+    docs?: (string | Product)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  note?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -338,9 +529,73 @@ export interface Supplier {
   address?: string | null;
   sdt?: string | null;
   fax?: number | null;
-  email: string;
+  email?: string | null;
   webside?: string | null;
+  chose?: ('vatlieu' | 'maymoc') | null;
+  importedMachine?: (string | Machine)[] | null;
   'Imported materials'?: (string | Material)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "machine".
+ */
+export interface Machine {
+  id: string;
+  nameMachine?: string | null;
+  machineId?: string | null;
+  machineType?: ('maydet' | 'maycatvai' | 'mayinlogo' | 'mayepnhiet' | 'maymay') | null;
+  suppliers?: {
+    docs?: (string | Supplier)[] | null;
+    hasNextPage?: boolean | null;
+  } | null;
+  origin?: string | null;
+  yearOfManufacture?: string | null;
+  dateUser?: string | null;
+  install?: string | null;
+  tsMachine?: {
+    capacity?: string | null;
+    voltage?: string | null;
+    dimension?: string | null;
+    function?: string | null;
+    velocity?: string | null;
+    power?: string | null;
+  };
+  maintenance?: {
+    cycle?: ('hangthang' | 'hangquy' | 'hangnam') | null;
+    lastCycle?: string | null;
+    nextCycle?: string | null;
+    employee?: (string | null) | User;
+  };
+  performance?: {
+    status?: ('active' | 'pause' | 'fix') | null;
+    averagePerformance?: string | null;
+    incidents?:
+      | {
+          nameIncidents?: string | null;
+          cause?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  regulation?: {
+    operatingInstructions?: string | null;
+    safetyRequirements?: string | null;
+    employee?: (string | null) | User;
+    suly?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "colors".
+ */
+export interface Color {
+  id: string;
+  name?: string | null;
+  hex?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -351,9 +606,24 @@ export interface Supplier {
 export interface Products_Inventory {
   id: string;
   inventoryId?: string | null;
-  productId?: (string | null) | Product;
-  amount?: number | null;
-  unit?: ('Cái' | 'Đôi' | 'Yến') | null;
+  address?: string | null;
+  employee?: (string | null) | User;
+  phone?: string | null;
+  area?: string | null;
+  catalogueOfGoods?:
+    | {
+        productId?: (string | null) | Product;
+        danhmuc?: {
+          amount?: number | null;
+          unti?: ('cai' | 'bo' | 'doi') | null;
+        };
+        cost?: {
+          importPrice?: number | null;
+          unitPrice?: ('VND' | 'USD') | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -393,20 +663,6 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: string;
-  name: string;
-  post?: {
-    docs?: (string | Post)[] | null;
-    hasNextPage?: boolean | null;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "posts".
  */
 export interface Post {
@@ -422,9 +678,220 @@ export interface Post {
  */
 export interface Test1 {
   id: string;
-  test: string;
-  email: string;
-  name?: string | null;
+  label: string;
+  value: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MaterialsAndMachine_Inventory".
+ */
+export interface MaterialsAndMachine_Inventory {
+  id: string;
+  titel?: string | null;
+  inventoryId?: string | null;
+  inventoryName?: string | null;
+  location?: string | null;
+  managerInventory?: (string | null) | User;
+  phoneInventory?: string | null;
+  material?:
+    | {
+        materialName?: (string | null) | Material;
+        suppliersMaterial?: (string | null) | Supplier;
+        soluongMaterial?: number | null;
+        unitMaterial?:
+          | ('kg' | 'g' | 't' | 'm' | 'cuon' | 'l' | 'cai' | 'bo' | 'thung' | 'hop' | 'bao' | 'pallet')
+          | null;
+        priceMaterial?: number | null;
+        totalPriceMaterial?: number | null;
+        typePriceMaterial?: ('VND' | 'USD') | null;
+        id?: string | null;
+      }[]
+    | null;
+  machine?:
+    | {
+        machineName?: (string | null) | Machine;
+        suppliersMachine?: (string | null) | Supplier;
+        soluongMachine?: number | null;
+        unitMachine?:
+          | (
+              | 'cai'
+              | 'bo'
+              | 'chiec'
+              | 'he-thong'
+              | 'may'
+              | 't'
+              | 'kg'
+              | 'thung'
+              | 'hop'
+              | 'bao'
+              | 'pallet'
+              | 'lo'
+              | 'cuon'
+              | 'm'
+            )
+          | null;
+        priceMachine?: number | null;
+        totalPriceMachine?: string | null;
+        typePriceMachine?: ('VND' | 'USD') | null;
+        id?: string | null;
+      }[]
+    | null;
+  goodsDeliveryNote?: string | null;
+  goodsReceivedNote?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "goodsDeliveryNote".
+ */
+export interface GoodsDeliveryNote {
+  id: string;
+  saved?: boolean | null;
+  goodsDeliveryNoteID?: string | null;
+  date?: string | null;
+  inventory?: (string | null) | Products_Inventory;
+  shipper?: string | null;
+  employee?: (string | null) | User;
+  voucherMaker?: (string | null) | User;
+  produce?:
+    | {
+        sanpham?: (string | null) | Product;
+        soluong?: number | null;
+        unti?: ('cai' | 'bo' | 'doi') | null;
+        cost?: number | null;
+        rate?: string | null;
+        total?: number | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  report?: {
+    cai?: string | null;
+    bo?: string | null;
+    doi?: string | null;
+    totalValue?: string | null;
+    rateValue?: ('VND' | 'USD') | null;
+    payType?: ('tienmat' | 'chuyenkhoan') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "goodsReceiveNote".
+ */
+export interface GoodsReceiveNote {
+  id: string;
+  title?: string | null;
+  goodsReceivedNoteId?: string | null;
+  inventory?: (string | null) | MaterialsAndMachine_Inventory;
+  date?: string | null;
+  shipper?: string | null;
+  employee?: (string | null) | User;
+  voucherMaker?: (string | null) | User;
+  materials?: {
+    materialsProduce?:
+      | {
+          materialsName?: (string | null) | Material;
+          suppliersMaterials?: (string | null) | Supplier;
+          soluongMaterials?: number | null;
+          unitsMaterials?:
+            | ('kg' | 'g' | 't' | 'm' | 'cuon' | 'l' | 'cai' | 'bo' | 'thung' | 'hop' | 'bao' | 'pallet')
+            | null;
+          priceMaterials?: number | null;
+          totalMaterials?: number | null;
+          typePriceMaterials?: string | null;
+          noteMaterial?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  machine?: {
+    machinesProduce?:
+      | {
+          machinesName?: (string | null) | Machine;
+          suppliersMachines?: (string | null) | Supplier;
+          soluongMachines?: number | null;
+          unitsMachines?:
+            | (
+                | 'cai'
+                | 'bo'
+                | 'chiec'
+                | 'he-thong'
+                | 'may'
+                | 't'
+                | 'kg'
+                | 'thung'
+                | 'hop'
+                | 'bao'
+                | 'pallet'
+                | 'lo'
+                | 'cuon'
+                | 'm'
+              )
+            | null;
+          priceMachines?: number | null;
+          totalMachines?: number | null;
+          typePriceMachines?: string | null;
+          noteMachines?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Thống kê vật liệu đã nhập
+   */
+  report?: {
+    /**
+     * Thống kê vật liệu đã nhập
+     */
+    reportMaterial?:
+      | {
+          reportMaterialName?: (string | null) | Material;
+          reportMaterialSoLuong?: number | null;
+          reportMaterialUnits?:
+            | ('kg' | 'g' | 't' | 'm' | 'cuon' | 'l' | 'cai' | 'bo' | 'thung' | 'hop' | 'bao' | 'pallet')
+            | null;
+          reportNoteMaterial?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Thống kê vật liệu đã nhập
+     */
+    reportMachines?:
+      | {
+          reportMachinesName?: (string | null) | Machine;
+          reportMachinesSoLuong?: number | null;
+          reportMachinesUnits?:
+            | (
+                | 'cai'
+                | 'bo'
+                | 'chiec'
+                | 'he-thong'
+                | 'may'
+                | 't'
+                | 'kg'
+                | 'thung'
+                | 'hop'
+                | 'bao'
+                | 'pallet'
+                | 'lo'
+                | 'cuon'
+                | 'm'
+              )
+            | null;
+          reportNoteMachines?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    totalValue?: number | null;
+    rateValue?: ('VND' | 'USD') | null;
+    payType?: ('tienmat' | 'chuyenkhoan') | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -484,8 +951,8 @@ export interface PayloadLockedDocument {
         value: string | Products_Inventory;
       } | null)
     | ({
-        relationTo: 'Materials_Inventory';
-        value: string | Materials_Inventory;
+        relationTo: 'MaterialsAndMachine_Inventory';
+        value: string | MaterialsAndMachine_Inventory;
       } | null)
     | ({
         relationTo: 'Suppliers';
@@ -498,6 +965,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'WorkTime';
         value: string | WorkTime;
+      } | null)
+    | ({
+        relationTo: 'colors';
+        value: string | Color;
+      } | null)
+    | ({
+        relationTo: 'subCategories';
+        value: string | SubCategory;
+      } | null)
+    | ({
+        relationTo: 'machine';
+        value: string | Machine;
+      } | null)
+    | ({
+        relationTo: 'goodsDeliveryNote';
+        value: string | GoodsDeliveryNote;
+      } | null)
+    | ({
+        relationTo: 'goodsReceiveNote';
+        value: string | GoodsReceiveNote;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -554,7 +1041,7 @@ export interface UsersSelect<T extends boolean = true> {
   Date_of_birth?: T;
   address?: T;
   phone?: T;
-  'Học Vấn'?:
+  hocvan?:
     | T
     | {
         degree?: T;
@@ -652,10 +1139,37 @@ export interface ProductsSelect<T extends boolean = true> {
   productID?: T;
   nameProduct?: T;
   category?: T;
-  size?: T;
+  subcategory?: T;
+  origin?: T;
+  price?: T;
+  currency?: T;
+  previousCurrency?: T;
   material?: T;
+  sizes?:
+    | T
+    | {
+        size?: T;
+        id?: T;
+      };
+  color?: T;
+  specialfeatures?: T;
+  QualityStandards?:
+    | T
+    | {
+        nameCertificate?: T;
+        img?: T;
+        Note?: T;
+        id?: T;
+      };
+  SafetyCertification?:
+    | T
+    | {
+        nameCertificate?: T;
+        img?: T;
+        Note?: T;
+        id?: T;
+      };
   quantity?: T;
-  Price?: T;
   description?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -667,9 +1181,69 @@ export interface ProductsSelect<T extends boolean = true> {
 export interface MaterialsSelect<T extends boolean = true> {
   materialsID?: T;
   materialsName?: T;
-  tonkho?: T;
+  materialstype?: T;
   supplier?: T;
+  Origin?: T;
   cost?: T;
+  currency?: T;
+  previousCurrency?: T;
+  Dimension?:
+    | T
+    | {
+        Length?: T;
+        Width?: T;
+        Thickness?: T;
+        id?: T;
+      };
+  specificvolume?:
+    | T
+    | {
+        Massspecific?: T;
+        Unitspecific?: T;
+        previousspecific?: T;
+        id?: T;
+      };
+  tensilestrength?:
+    | T
+    | {
+        Masstensile?: T;
+        Unittensile?: T;
+        id?: T;
+      };
+  compressivestrength?:
+    | T
+    | {
+        Masscompressive?: T;
+        Unitcompressive?: T;
+        id?: T;
+      };
+  temperaturetolerance?:
+    | T
+    | {
+        Masstemperaturetolerance?: T;
+        Unittemperaturetolerance?: T;
+        previoustemperaturetolerance?: T;
+        id?: T;
+      };
+  color?: T;
+  qualitystandards?:
+    | T
+    | {
+        nameCertificate?: T;
+        img?: T;
+        Note?: T;
+        id?: T;
+      };
+  safetycertification?:
+    | T
+    | {
+        nameCertificate?: T;
+        img?: T;
+        Note?: T;
+        id?: T;
+      };
+  products?: T;
+  note?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -710,8 +1284,13 @@ export interface OrdersSelect<T extends boolean = true> {
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
-  name?: T;
-  post?: T;
+  title?: T;
+  slug?: T;
+  image?: T;
+  description?: T;
+  subCategories?: T;
+  products?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -730,9 +1309,8 @@ export interface PostsSelect<T extends boolean = true> {
  * via the `definition` "test1_select".
  */
 export interface Test1Select<T extends boolean = true> {
-  test?: T;
-  email?: T;
-  name?: T;
+  label?: T;
+  value?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -753,22 +1331,68 @@ export interface TasksSelect<T extends boolean = true> {
  */
 export interface Products_InventorySelect<T extends boolean = true> {
   inventoryId?: T;
-  productId?: T;
-  amount?: T;
-  unit?: T;
+  address?: T;
+  employee?: T;
+  phone?: T;
+  area?: T;
+  catalogueOfGoods?:
+    | T
+    | {
+        productId?: T;
+        danhmuc?:
+          | T
+          | {
+              amount?: T;
+              unti?: T;
+            };
+        cost?:
+          | T
+          | {
+              importPrice?: T;
+              unitPrice?: T;
+            };
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "Materials_Inventory_select".
+ * via the `definition` "MaterialsAndMachine_Inventory_select".
  */
-export interface Materials_InventorySelect<T extends boolean = true> {
+export interface MaterialsAndMachine_InventorySelect<T extends boolean = true> {
+  titel?: T;
   inventoryId?: T;
-  materialsID?: T;
-  amount?: T;
-  unit?: T;
+  inventoryName?: T;
   location?: T;
+  managerInventory?: T;
+  phoneInventory?: T;
+  material?:
+    | T
+    | {
+        materialName?: T;
+        suppliersMaterial?: T;
+        soluongMaterial?: T;
+        unitMaterial?: T;
+        priceMaterial?: T;
+        totalPriceMaterial?: T;
+        typePriceMaterial?: T;
+        id?: T;
+      };
+  machine?:
+    | T
+    | {
+        machineName?: T;
+        suppliersMachine?: T;
+        soluongMachine?: T;
+        unitMachine?: T;
+        priceMachine?: T;
+        totalPriceMachine?: T;
+        typePriceMachine?: T;
+        id?: T;
+      };
+  goodsDeliveryNote?: T;
+  goodsReceivedNote?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -784,6 +1408,8 @@ export interface SuppliersSelect<T extends boolean = true> {
   fax?: T;
   email?: T;
   webside?: T;
+  chose?: T;
+  importedMachine?: T;
   'Imported materials'?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -817,6 +1443,195 @@ export interface WorkTimeSelect<T extends boolean = true> {
   shift?: T;
   note?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "colors_select".
+ */
+export interface ColorsSelect<T extends boolean = true> {
+  name?: T;
+  hex?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subCategories_select".
+ */
+export interface SubCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  image?: T;
+  description?: T;
+  parentCategory?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "machine_select".
+ */
+export interface MachineSelect<T extends boolean = true> {
+  nameMachine?: T;
+  machineId?: T;
+  machineType?: T;
+  suppliers?: T;
+  origin?: T;
+  yearOfManufacture?: T;
+  dateUser?: T;
+  install?: T;
+  tsMachine?:
+    | T
+    | {
+        capacity?: T;
+        voltage?: T;
+        dimension?: T;
+        function?: T;
+        velocity?: T;
+        power?: T;
+      };
+  maintenance?:
+    | T
+    | {
+        cycle?: T;
+        lastCycle?: T;
+        nextCycle?: T;
+        employee?: T;
+      };
+  performance?:
+    | T
+    | {
+        status?: T;
+        averagePerformance?: T;
+        incidents?:
+          | T
+          | {
+              nameIncidents?: T;
+              cause?: T;
+              id?: T;
+            };
+      };
+  regulation?:
+    | T
+    | {
+        operatingInstructions?: T;
+        safetyRequirements?: T;
+        employee?: T;
+        suly?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "goodsDeliveryNote_select".
+ */
+export interface GoodsDeliveryNoteSelect<T extends boolean = true> {
+  saved?: T;
+  goodsDeliveryNoteID?: T;
+  date?: T;
+  inventory?: T;
+  shipper?: T;
+  employee?: T;
+  voucherMaker?: T;
+  produce?:
+    | T
+    | {
+        sanpham?: T;
+        soluong?: T;
+        unti?: T;
+        cost?: T;
+        rate?: T;
+        total?: T;
+        note?: T;
+        id?: T;
+      };
+  report?:
+    | T
+    | {
+        cai?: T;
+        bo?: T;
+        doi?: T;
+        totalValue?: T;
+        rateValue?: T;
+        payType?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "goodsReceiveNote_select".
+ */
+export interface GoodsReceiveNoteSelect<T extends boolean = true> {
+  title?: T;
+  goodsReceivedNoteId?: T;
+  inventory?: T;
+  date?: T;
+  shipper?: T;
+  employee?: T;
+  voucherMaker?: T;
+  materials?:
+    | T
+    | {
+        materialsProduce?:
+          | T
+          | {
+              materialsName?: T;
+              suppliersMaterials?: T;
+              soluongMaterials?: T;
+              unitsMaterials?: T;
+              priceMaterials?: T;
+              totalMaterials?: T;
+              typePriceMaterials?: T;
+              noteMaterial?: T;
+              id?: T;
+            };
+      };
+  machine?:
+    | T
+    | {
+        machinesProduce?:
+          | T
+          | {
+              machinesName?: T;
+              suppliersMachines?: T;
+              soluongMachines?: T;
+              unitsMachines?: T;
+              priceMachines?: T;
+              totalMachines?: T;
+              typePriceMachines?: T;
+              noteMachines?: T;
+              id?: T;
+            };
+      };
+  report?:
+    | T
+    | {
+        reportMaterial?:
+          | T
+          | {
+              reportMaterialName?: T;
+              reportMaterialSoLuong?: T;
+              reportMaterialUnits?: T;
+              reportNoteMaterial?: T;
+              id?: T;
+            };
+        reportMachines?:
+          | T
+          | {
+              reportMachinesName?: T;
+              reportMachinesSoLuong?: T;
+              reportMachinesUnits?: T;
+              reportNoteMachines?: T;
+              id?: T;
+            };
+        totalValue?: T;
+        rateValue?: T;
+        payType?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

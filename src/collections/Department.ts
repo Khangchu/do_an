@@ -1,5 +1,6 @@
 import { CollectionConfig } from 'payload'
 import { Os_Field } from '@/fields/Fields_Department'
+import { beforeValidate, beforeChange } from '@/Hooks/HookDepartment'
 
 export const department: CollectionConfig = {
   slug: 'department',
@@ -54,14 +55,7 @@ export const department: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeValidate: [
-      ({ data }) => {
-        if (!data) return
-        if (!data.idDepartment) {
-          data.idDepartment = `ID-${Date.now()}${Math.floor(Math.random() * 10000)}`
-        }
-        data.title = `${data.idDepartment}-${data.nameDepartment || 'Unknown'}`
-      },
-    ],
+    beforeValidate: [beforeValidate],
+    beforeChange: [beforeChange],
   },
 }

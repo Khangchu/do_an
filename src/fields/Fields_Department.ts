@@ -67,7 +67,7 @@ export const Os_Field: Field = {
         const docCheckEmployees = checkEmployees?.docs ?? []
         const checkOutEmployees = docCheckEmployees.flatMap((doc) =>
           (doc?.Os_Field?.employees ?? [])
-            .map((emp) => emp.id)
+            .map((emp) => emp?.id)
             .filter((id) => id && !data?.Os_Field?.employees?.includes(id)),
         )
         return {

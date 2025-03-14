@@ -7,7 +7,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 
 export const hero: Field = {
-  name: 'Học Vấn',
+  name: 'hocvan',
   label: '',
   type: 'group',
   fields: [
@@ -15,19 +15,43 @@ export const hero: Field = {
       name: 'degree',
       type: 'text',
       label: 'Bằng Cấp',
-      required: true,
+      validate: (value: unknown) => {
+        if (!value) {
+          return 'Không được để trống'
+        }
+        if (typeof value !== 'string') {
+          return 'Giá trị phải là chuỗi số'
+        }
+        return true
+      },
     },
     {
       name: 'university',
       type: 'text',
       label: 'Đại Học',
-      required: true,
+      validate: (value: unknown) => {
+        if (!value) {
+          return 'Không được để trống'
+        }
+        if (typeof value !== 'string') {
+          return 'Giá trị phải là chuỗi số'
+        }
+        return true
+      },
     },
     {
       name: 'specialization',
       type: 'text',
       label: 'Chuyên Ngành',
-      required: true,
+      validate: (value: unknown) => {
+        if (!value) {
+          return 'Không được để trống'
+        }
+        if (typeof value !== 'string') {
+          return 'Giá trị phải là chuỗi số'
+        }
+        return true
+      },
     },
     {
       name: 'Certificate',
@@ -63,6 +87,7 @@ export const employee: Field = {
       name: 'position',
       label: 'Vị trí công việc',
       type: 'select',
+      defaultValue: 'employees',
       options: [
         {
           label: 'Trưởng Phòng',

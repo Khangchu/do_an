@@ -12,16 +12,21 @@ import { Media } from './collections/Media'
 import { Products } from './collections/Products'
 import { Materials } from './collections/Materials'
 import { ProductionPlans } from './collections/ProductionPlans'
-import { Categories } from './collections/Categories'
+import { Categories } from './collections/ParentCategories'
 import { Posts } from './collections/Posts'
 import { Test1 } from './collections/test'
 import { Orders } from './collections/Orders'
 import { Tasks } from './collections/Tasks'
 import { Products_Inventory } from './collections/Products_Inventory'
-import { Materials_Inventory } from './collections/Materials_Inventory'
+import { MaterialsAndMachine_Inventory } from './collections/MaterialsAndMachine_Inventory'
 import { Suppliers } from './collections/Suppliers'
 import { department } from './collections/Department'
 import { WorkTime } from './collections/WorkTime'
+import { Colors } from './collections/Colors'
+import { SubCategories } from './collections/SubCategories'
+import { machine } from './collections/Machine'
+import { goodsDeliveryNote } from './collections/GoodsDeliveryNote'
+import { goodsReceivedNote } from './collections/GoodsReceivedNote'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -45,10 +50,15 @@ export default buildConfig({
     Test1,
     Tasks,
     Products_Inventory,
-    Materials_Inventory,
+    MaterialsAndMachine_Inventory,
     Suppliers,
     department,
     WorkTime,
+    Colors,
+    SubCategories,
+    machine,
+    goodsDeliveryNote,
+    goodsReceivedNote,
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

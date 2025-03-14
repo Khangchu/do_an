@@ -7,7 +7,7 @@ export const Suppliers: CollectionConfig = {
     plural: 'Nhà Cung Cấp',
   },
   admin: {
-    useAsTitle: '',
+    useAsTitle: 'name',
   },
   fields: [
     {
@@ -54,7 +54,6 @@ export const Suppliers: CollectionConfig = {
       name: 'email',
       label: 'Email',
       type: 'email',
-      required: true,
       unique: true,
     },
     {
@@ -63,11 +62,30 @@ export const Suppliers: CollectionConfig = {
       type: 'text',
       validate: (value: unknown) => {
         if (typeof value !== 'string') return 'Giá trị không hợp lệ'
-
-        // Biểu thức chính quy để kiểm tra URL hợp lệ
         const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
-
         return regex.test(value) ? true : 'Vui lòng nhập một URL hợp lệ'
+      },
+    },
+    {
+      name: 'chose',
+      label: 'Nhập',
+      type: 'radio',
+      options: [
+        { label: 'Vật liệu', value: 'vatlieu' },
+        { label: 'Máy móc', value: 'maymoc' },
+      ],
+    },
+    {
+      name: 'importedMachine',
+      label: 'Nhập máy móc',
+      type: 'relationship',
+      relationTo: 'machine',
+      hasMany: true,
+      admin: {
+        condition: (data) => {
+          if (data.chose === 'maymoc') return true
+          return false
+        },
       },
     },
     {
@@ -76,6 +94,12 @@ export const Suppliers: CollectionConfig = {
       type: 'relationship',
       relationTo: 'materials',
       hasMany: true,
+      admin: {
+        condition: (data) => {
+          if (data.chose === 'vatlieu') return true
+          return false
+        },
+      },
     },
   ],
 }

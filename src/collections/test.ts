@@ -1,34 +1,29 @@
 import { APIError, CollectionConfig } from 'payload'
 export const Test1: CollectionConfig = {
   slug: 'test1',
-  admin: {
-    useAsTitle: 'test',
-  },
   fields: [
     {
-      name: 'test',
-      label: 'name',
-      type: 'text',
-      unique: true,
-      required: true,
-    },
-    {
-      name: 'email',
-      type: 'text',
-      unique: true, // Đảm bảo email là duy nhất
-      required: true,
-    },
-    {
-      name: 'name',
-      type: 'text',
+      type: 'row',
+      fields: [
+        {
+          name: 'label',
+          label: 'Label',
+          type: 'text',
+          required: true,
+          admin: {
+            width: '45%',
+          },
+        },
+        {
+          name: 'value',
+          label: 'Value',
+          type: 'text',
+          required: true,
+          admin: {
+            width: '45%',
+          },
+        },
+      ],
     },
   ],
-  hooks: {
-    beforeValidate: [
-      async ({ data, req }) => {
-        const { name } = data
-        console.log('check', name)
-      },
-    ],
-  },
 }
